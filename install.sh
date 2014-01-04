@@ -5,7 +5,11 @@ YELLOW="\e[1;33m"
 END="\e[0m"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/conf"
 
-echo "$DIR"
+echo -e "${GREEN}"
+read -p "Mise a jour du nom de l'ordinateur : " compName
+echo -e "${END}"
+rm -f /etc/hostname
+echo $compName >> /etc/hostname
 
 echo -e "${GREEN}Mise a jour du mot de passe de l'utilisateur ROOT...${END}"
 passwd
@@ -64,7 +68,8 @@ read -s -p "    Nouveau mot de passe root SQL : " sqlPass
 echo -e "${END}"
 mysql -uroot -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('$sqlPass')"
 mysql -uroot -p$sqlPass -e "SET PASSWORD FOR 'root'@'127.0.0.1' = PASSWORD('$sqlPass')"
-mysql -uroot -p$sqlPass -e "SET PASSWORD FOR 'root'@'alarmpi' = PASSWORD('$sqlPass')"
+mysql -uroot -p$sqlPass -e "UPDATE user SET Host = '$compName' WHERE Host = 'alarmpi'"
+mysql -uroot -p$sqlPass -e "SET PASSWORD FOR 'root'@'$compName' = PASSWORD('$sqlPass')"
 mysql -uroot -p$sqlPass -e "SET PASSWORD FOR 'root'@'::1' = PASSWORD('$sqlPass')"
 
 echo -e "${GREEN}Mise a jour du mot de passe de l'utilisateur HTTP${END}"
