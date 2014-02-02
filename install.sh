@@ -26,31 +26,31 @@ echo -e "\n${GREEN}Mises a jour... ${END}"
 pacman -Ssy --noconfirm
 
 echo -e "\n${GREEN}Installation des serveurs Web et FTP... ${END}"
-pacman -Syu --noconfirm yaourt vsftpd apache php php-apache mariadb phpmyadmin php-mcrypt
+pacman -Syu --noconfirm yaourt vsftpd apache php php-apache mariadb phpmyadmin php-mcrypt vim git
 
 echo -e "\n${GREEN}Configuration de Very Secure FTP..."
 if [ -f $DIR/vsftpd.conf ]; then
-	cp -f $DIR/vsftpd.conf /etc/vsftpd.conf
+cp -f $DIR/vsftpd.conf /etc/vsftpd.conf
 else
-	echo -e "${RED}vsftpd.conf ne se trouve pas a la racine du script, configuration incomplete...${END}\n"
-	exit 1
+echo -e "${RED}vsftpd.conf ne se trouve pas a la racine du script, configuration incomplete...${END}\n"
+exit 1
 fi
 
 echo -e "\n${GREEN}Configuration de Apache..."
 if [ -f $DIR/httpd.conf ]; then
-	cp -f $DIR/httpd.conf /etc/httpd/conf/httpd.conf
+cp -f $DIR/httpd.conf /etc/httpd/conf/httpd.conf
 else
-	echo -e "${RED}httpd.conf ne se trouve pas a la racine du script, configuration incomplete...${END}\n"
-	exit 1
+echo -e "${RED}httpd.conf ne se trouve pas a la racine du script, configuration incomplete...${END}\n"
+exit 1
 fi
 
 echo -e "\n${GREEN}Configuration de PHP..."
 cp /etc/webapps/phpmyadmin/apache.example.conf /etc/httpd/conf/extra/httpd-phpmyadmin.conf
 if [ -f $DIR/php.ini ]; then
-	cp -f $DIR/php.ini /etc/php/php.ini
+cp -f $DIR/php.ini /etc/php/php.ini
 else
-	echo -e "${RED}php.ini ne se trouve pas a la racine du script, configuration incomplete...${END}\n"
-	exit 1
+echo -e "${RED}php.ini ne se trouve pas a la racine du script, configuration incomplete...${END}\n"
+exit 1
 fi
 
 echo -e "\n${GREEN}Enabling and restarting VSFTP... "
@@ -66,11 +66,19 @@ systemctl restart httpd
 echo -e "\n${GREEN}Configuration de MariaDB..."
 read -s -p "    Nouveau mot de passe root SQL : " sqlPass
 echo -e "${END}"
-mysql -uroot -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('$sqlPass')"
-mysql -uroot -p$sqlPass -e "SET PASSWORD FOR 'root'@'127.0.0.1' = PASSWORD('$sqlPass')"
-mysql -uroot -p$sqlPass -e "UPDATE user SET Host = '$compName' WHERE Host = 'alarmpi'"
-mysql -uroot -p$sqlPass -e "SET PASSWORD FOR 'root'@'$compName' = PASSWORD('$sqlPass')"
-mysql -uroot -p$sqlPass -e "SET PASSWORD FOR 'root'@'::1' = PASSWORD('$sqlPass')"
+mysql -uroot -e "USE mysql; SET PASSWORD FOR 'root'@'localhost' = PASSWORD('$sqlPass')"
+mysql -uroot -p$sqlPass -e "USE mysql; SET PASSWORD FOR 'root'@'127.0.0.1' = PASSWORD('$sqlPass')"
+mysql -uroot -p$sqlPass -e "USE mysql; UPDATE user SET Host = '$compName' WHERE Host = 'alarmpi'"
+mysql -uroot -p$sqlPass -e "USE mysql; SET PASSWORD FOR 'root'@'$compName' = PASSWORD('$sqlPass')"
+mysql -uroot -p$sqlPass -e "USE mysql; SET PASSWORD FOR 'root'@'::1' = PASSWORD('$sqlPass')"
+
+echo -e "${GREEN}"
+read -p "Telechargement du repo Arnaud-Assurance ? (y / n)" response
+echo -e "${END}"
+if [ $reponse = 'y' ]; then
+cd /srv/http
+git clone http://bitbucket.org/enoxime/arnaud-assurance.git
+fi
 
 echo -e "${GREEN}Mise a jour du mot de passe de l'utilisateur HTTP${END}"
 passwd http
