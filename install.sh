@@ -53,6 +53,9 @@ echo -e "${RED}php.ini ne se trouve pas a la racine du script, configuration inc
 exit 1
 fi
 
+echo -e "\n${GREEN}Clamav update..."
+freshclam
+
 echo -e "\n${GREEN}Enabling and restarting VSFTP... "
 systemctl enable vsftpd
 systemctl restart vsftpd
