@@ -26,7 +26,7 @@ echo -e "\n${GREEN}Mises a jour... ${END}"
 pacman -Ssy --noconfirm
 
 echo -e "\n${GREEN}Installation des serveurs Web et FTP... ${END}"
-pacman -Syu --noconfirm yaourt vsftpd apache php php-apache mariadb phpmyadmin php-mcrypt vim git clamav php-pear
+pacman -Syu --noconfirm yaourt vsftpd apache php php-apache mariadb phpmyadmin php-mcrypt vim git clamav php-pear binutils
 
 echo -e "\n${GREEN}Configuration de Very Secure FTP..."
 if [ -f $DIR/vsftpd.conf ]; then
